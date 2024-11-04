@@ -1,0 +1,27 @@
+# Enable the rewrite engine
+
+RewriteEngine ON
+
+# Check if the request is not for a real file
+
+RewriteCond %{REQUEST_FILENAME} !-f
+
+# Check if the request is not for a real directory
+
+RewriteCond %{REQUEST_FILENAME} !-d
+
+# Check if the request is not for a symbolic link
+
+RewriteCond %{REQUEST_FILENAME} !-l
+
+# If none of the above conditions are met, rewrite the URL to index.php
+
+RewriteCond %{REQUEST_URI} ^/organize_it/api/login
+RewriteRule . login.php [L]
+
+RewriteCond %{REQUEST_URI} ^/organize_it/api/tasks
+RewriteRule . index.php [L]
+
+# Apache configuration command
+# Configuring Apache to Ensure that the Authorization header is available in PHP as $_SERVER['HTTP_AUTHORIZATION']
+SetEnvIf Authorization "(.*)" HTTP_AUTHORIZATION=$1
