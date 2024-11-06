@@ -67,4 +67,4 @@ require __DIR__ . "/tokens.php";
 
 $refresh_token_gateway->deleteRefreshTokenFromDatabase($data['token']);
 
-$refresh_token_gateway->addRefreshTokenToDatbase($refresh_token, $refresh_token_expiry);
+$refresh_token_gateway->addRefreshTokenToDatabase($refresh_token, $refresh_token_expiry);

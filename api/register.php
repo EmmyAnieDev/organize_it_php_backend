@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         $refresh_token_gateway = new RefreshTokenGateway($database, $_ENV['SECRET_KEY']);
         
-        $refresh_token_gateway->addRefreshTokenToDatbase($refresh_token, $refresh_token_expiry);
+        $refresh_token_gateway->addRefreshTokenToDatabase($refresh_token, $refresh_token_expiry);
 
     } else {
         http_response_code(400);
