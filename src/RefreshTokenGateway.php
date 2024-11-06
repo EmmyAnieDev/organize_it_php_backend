@@ -10,7 +10,7 @@ class RefreshTokenGateway {
 
     }
 
-    public function addRefreshTokenToDatbase(string $token, int $expiry) {
+    public function addRefreshTokenToDatabase(string $token, int $expiry) {
 
         $hash = hash_hmac("sha256", $token, $this->secret_key);
 
@@ -25,7 +25,7 @@ class RefreshTokenGateway {
 
     }
 
-    public function deleteRefreshTokenFromDatbase(string $token) : int {
+    public function deleteRefreshTokenFromDatabase(string $token) : int {
 
         $hash = hash_hmac("sha256", $token, $this->secret_key);
     
