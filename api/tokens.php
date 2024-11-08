@@ -3,10 +3,10 @@
 $payload = [
     "sub" => $user['id'],
     "name" => $user['name'],
-    "exp" => time() + 600
+    "exp" => time() + 100
 ];
 
-$refresh_token_expiry = time() + 1800;
+$refresh_token_expiry = time() + 300;
 
 $refresh_token_payload = [
     "sub" => $user['id'],
