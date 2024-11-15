@@ -3,14 +3,10 @@
 require dirname(__DIR__) . "/vendor/autoload.php";
 require __DIR__ . "/bootstrap.php";
 
-use Dotenv\Dotenv;
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
     try {
-
-        $dotenv = Dotenv::createImmutable(dirname(__DIR__));
-        $dotenv->load();
 
         $database = new Database($_ENV['DB_HOST'], $_ENV['DB_NAME'], $_ENV['DB_USER'], $_ENV['DB_PASS']);
         $conn = $database->getConnection();
