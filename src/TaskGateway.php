@@ -51,7 +51,7 @@ class  TaskGateway {
     public function createTaskForUser(array $data, int $user_id): string {
 
         $sql = "INSERT INTO task (name, is_completed, start_date, end_date, created_at, user_id) 
-                VALUES (:name, :is_completed, :start_date, :end_date, :created_at :user_id)";
+                VALUES (:name, :is_completed, :start_date, :end_date, :created_at, :user_id)";
     
         $stmt = $this->conn->prepare($sql);
     

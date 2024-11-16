@@ -60,7 +60,7 @@ class TaskController {
                     echo json_encode($task);
                     break;
 
-                case "PATCH":
+                case "PUT":
                     
                     $data = (array) json_decode(file_get_contents("php://input"), true);
 
@@ -84,7 +84,7 @@ class TaskController {
                     break;
 
                 default:
-                    $this->respondMethodNotAllowed('GET, PATCH, DELETE');
+                    $this->respondMethodNotAllowed('GET, PUT, DELETE');
                     break;
             }
         }
