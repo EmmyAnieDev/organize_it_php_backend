@@ -113,51 +113,76 @@ class  TaskGateway {
 
 
     public function updateTaskForUser(int $user_id, int $id, array $data): int {
-
-        $fields = [];
-    
-        if (!empty($data['name'])) {
-            $fields['name'] = [$data['name'], PDO::PARAM_STR];
+        $this->conn->beginTransaction();
+        
+        try {
+            $fields = [];
+            
+            if (!empty($data['name'])) {
+                $fields['name'] = [$data['name'], PDO::PARAM_STR];
+            }
+            
+            if (array_key_exists('start_date', $data)) {
+                $fields['start_date'] = [$data['start_date'], $data['start_date'] === null ? PDO::PARAM_NULL : PDO::PARAM_STR];
+            }
+            
+            if (array_key_exists('end_date', $data)) {
+                $fields['end_date'] = [$data['end_date'], $data['end_date'] === null ? PDO::PARAM_NULL : PDO::PARAM_STR];
+            }
+            
+            if (array_key_exists('is_completed', $data)) {
+                $fields['is_completed'] = [$data['is_completed'], PDO::PARAM_BOOL];
+            }
+        
+            // Update task table first
+            $rowsUpdated = 0;
+            if (!empty($fields)) {
+                $sets = array_map(function ($field) {
+                    return "$field = :$field";
+                }, array_keys($fields));
+            
+                $sql = "UPDATE task SET " . implode(", ", $sets) . " WHERE id = :id AND user_id = :user_id";
+            
+                $stmt = $this->conn->prepare($sql);
+                
+                $stmt->bindValue(":id", $id, PDO::PARAM_INT);
+                $stmt->bindValue(":user_id", $user_id, PDO::PARAM_INT);
+            
+                foreach ($fields as $key => $values) {
+                    $stmt->bindValue(":$key", $values[0], $values[1]);
+                }
+            
+                $stmt->execute();
+                $rowsUpdated = $stmt->rowCount();
+            }
+            
+            // Handle category update if provided
+            if (!empty($data['category'])) {
+                // Get or create category ID
+                $categoryId = $this->getCategoryIdByName($data['category']);
+                
+                // Remove existing category associations
+                $sql = "DELETE FROM task_category WHERE task_id = :task_id";
+                $stmt = $this->conn->prepare($sql);
+                $stmt->bindValue(":task_id", $id, PDO::PARAM_INT);
+                $stmt->execute();
+                
+                // Add new category association
+                $this->linkTaskToCategory($id, $categoryId);
+                
+                // If only category was updated, return 1
+                if ($rowsUpdated === 0) {
+                    $rowsUpdated = 1;
+                }
+            }
+            
+            $this->conn->commit();
+            return $rowsUpdated;
+            
+        } catch (PDOException $e) {
+            $this->conn->rollBack();
+            throw $e;
         }
-    
-        if (array_key_exists('start_date', $data)) {
-            $fields['start_date'] = [$data['start_date'], $data['start_date'] === null ? PDO::PARAM_NULL : PDO::PARAM_STR];
-        }
-    
-        if (array_key_exists('end_date', $data)) {
-            $fields['end_date'] = [$data['end_date'], $data['end_date'] === null ? PDO::PARAM_NULL : PDO::PARAM_STR];
-        }
-    
-        if (array_key_exists('is_completed', $data)) {
-            $fields['is_completed'] = [$data['is_completed'], PDO::PARAM_BOOL];
-        }
-    
-        // If no fields are provided, return 0 (nothing to update)
-        if (empty($fields)) {
-            return 0;
-        }
-    
-        // Map fields to SQL placeholders (e.g., "name = :name")
-        $sets = array_map(function ($field) {
-            return "$field = :$field";
-        }, array_keys($fields));
-    
-        // Construct the SQL query
-        $sql = "UPDATE task SET " . implode(", ", $sets) . " WHERE id = :id AND user_id = :user_id";
-    
-        $stmt = $this->conn->prepare($sql);
-    
-        $stmt->bindValue(":id", $id, PDO::PARAM_INT);
-        $stmt->bindValue(":user_id", $user_id, PDO::PARAM_INT);
-    
-        // Bind each field to its value and type
-        foreach ($fields as $key => $values) {
-            $stmt->bindValue(":$key", $values[0], $values[1]);
-        }
-    
-        $stmt->execute();
-    
-        return $stmt->rowCount();
     }
     
 
