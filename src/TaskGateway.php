@@ -11,17 +11,18 @@ class  TaskGateway {
     }
 
     public function getAllTaskForUser(int $user_id) : array {
-
-        $sql = 'SELECT * FROM task WHERE user_id = :user_id ORDER BY name' ;
-
+        // Order by end_date ASC to show nearest deadlines first
+        $sql = 'SELECT * FROM task 
+                WHERE user_id = :user_id 
+                ORDER BY end_date ASC, start_date ASC, name ASC';
+    
         $stmt = $this->conn->prepare($sql);
-
+    
         $stmt->bindValue(":user_id", $user_id, PDO::PARAM_INT);
-
+    
         $stmt->execute();
-
+    
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
-
     }
 
     public function getTaskByIdForUser(string $id, int $user_id) : array | false {
